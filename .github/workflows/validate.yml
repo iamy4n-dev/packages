@@ -1,0 +1,36 @@
+name: Validate Packages
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check packages directory exists and is non-empty
+        run: |
+          if [ ! -d packages ] || [ -z "$(ls -A packages/ 2>/dev/null)" ]; then
+            echo "ERROR: no packages found under packages/"
+            exit 1
+          fi
+
+      - name: Validate package structure
+        run: |
+          fail=0
+          for pkg in packages/*/; do
+            name=$(basename "$pkg")
+            if [ ! -d "$pkg/dotfiles" ]; then
+              echo "ERROR: $name missing dotfiles/ directory"
+              fail=1
+            fi
+            if [ -f "$pkg/manifest.yaml" ]; then
+              if ! python3 -c "import yaml, sys; yaml.safe_load(open(sys.argv[1]))" "$pkg/manifest.yaml" 2>/dev/null; then
+                echo "ERROR: $name has invalid manifest.yaml"
+                fail=1
+              fi
+            fi
+          done
+          exit $fail

@@ -10,6 +10,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Install dpod-seed
+        run: go install github.com/iamy4n-dev/dpod-seed@latest
+
+      - name: Validate package content
+        run: dpod-seed validate repo
+
       - name: Check packages directory exists and is non-empty
         run: |
           if [ ! -d packages ] || [ -z "$(ls -A packages/ 2>/dev/null)" ]; then

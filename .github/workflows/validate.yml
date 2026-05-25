@@ -15,7 +15,7 @@ jobs:
           go-version: stable
 
       - name: Install dpod-seed
-        run: go install github.com/iamy4n-dev/dpod-seed@latest
+        run: go install github.com/iamy4n-dev/dpod-seed@$(cat .dpod-seed-version)
 
       - name: Validate package content
         run: dpod-seed validate repo
